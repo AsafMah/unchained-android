@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.livingwithhippos.unchained.data.model.DownloadItem
+import com.github.livingwithhippos.unchained.data.model.NetworkError
 import com.github.livingwithhippos.unchained.data.model.UnchainedNetworkException
 import com.github.livingwithhippos.unchained.data.model.UploadedTorrent
 import com.github.livingwithhippos.unchained.data.repository.HostsRepository
@@ -85,6 +86,12 @@ constructor(
             val availableHosts = torrentsRepository.getAvailableHosts()
             if (availableHosts.isNullOrEmpty()) {
                 Timber.e("Error fetching available hosts")
+                networkExceptionLiveData.postEvent(
+                    NetworkError(
+                        -1,
+                        "Error fetching available hosts",
+                    )
+                )
             } else {
                 val uploadedTorrent =
                     torrentsRepository.addTorrent(binaryTorrent, availableHosts.first().host)

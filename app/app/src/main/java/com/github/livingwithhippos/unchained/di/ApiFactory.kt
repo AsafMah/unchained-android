@@ -2,6 +2,7 @@ package com.github.livingwithhippos.unchained.di
 
 import android.content.SharedPreferences
 import com.github.livingwithhippos.unchained.BuildConfig
+import com.github.livingwithhippos.unchained.data.model.AllDebridAgentInterceptor
 import com.github.livingwithhippos.unchained.data.model.EmptyBodyInterceptor
 import com.github.livingwithhippos.unchained.data.remote.AllDebridAuthenticationApi
 import com.github.livingwithhippos.unchained.data.remote.AllDebridTorrentsApi
@@ -233,8 +234,17 @@ object ApiFactory {
 
     @Provides
     @Singleton
+    @AllDebridClient
+    fun provideAllDebridOkHttpClient(@ClassicClient baseClient: OkHttpClient): OkHttpClient =
+        baseClient
+            .newBuilder()
+            .addInterceptor(AllDebridAgentInterceptor)
+            .build()
+
+    @Provides
+    @Singleton
     @AllDebridRetrofit
-    fun allDebridRetrofit(@ClassicClient okHttpClient: OkHttpClient): Retrofit =
+    fun allDebridRetrofit(@AllDebridClient okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .client(okHttpClient)
             .baseUrl("https://api.alldebrid.com/")

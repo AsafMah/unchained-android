@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.livingwithhippos.unchained.data.model.EmptyBodyError
+import com.github.livingwithhippos.unchained.data.model.NetworkError
 import com.github.livingwithhippos.unchained.data.model.TorrentItem
 import com.github.livingwithhippos.unchained.data.model.UnchainedNetworkException
 import com.github.livingwithhippos.unchained.data.model.UploadedTorrent
@@ -45,6 +46,12 @@ constructor(
             val availableHosts = torrentsRepository.getAvailableHosts()
             if (availableHosts.isNullOrEmpty()) {
                 Timber.e("Error fetching available hosts")
+                networkExceptionLiveData.postEvent(
+                    NetworkError(
+                        -1,
+                        "Error fetching available hosts",
+                    )
+                )
             } else {
                 val addedMagnet = torrentsRepository.addMagnet(magnet, availableHosts.first().host)
                 when (addedMagnet) {
@@ -73,6 +80,12 @@ constructor(
                 torrentLiveData.postEvent(TorrentEvent.TorrentInfo(torrentData))
             } else {
                 Timber.e("Retrieved torrent info were null for id $torrentID")
+                networkExceptionLiveData.postEvent(
+                    NetworkError(
+                        -1,
+                        "Error retrieving torrent info",
+                    )
+                )
             }
         }
     }
